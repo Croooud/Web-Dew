@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#09090b">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>Иван | Web & Telegram Разработчик</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600&family=Playfair+Display:ital,wght@0,400;1,400&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Layout: узкая колонка «экран телефона» по центру, Telegram MainButton закреплена снизу */
+  :root {
+    --bg: #09090b;
+    --surface: #131316;
+    --surface-2: #1c1c21;
+    --line: #26262c;
+    --fg: #f4f4f5;
+    --muted: #8e8e99;
+    --accent: #2AABEE;
+    --accent-ink: #04141d;
+    --font-display: 'Unbounded', 'Onest', system-ui, sans-serif;
+    --font-body: 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color-scheme: dark;
+  }
+  html, body { background: var(--bg); color: var(--fg); }
+  body { font-family: var(--font-body); font-size: 15px; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  .font-display { font-family: var(--font-display); }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .rise { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes sheet { from { transform: translateY(100%); } to { transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .sheet { animation: sheet .35s cubic-bezier(.2,.8,.2,1) both; }
+  .scrim { animation: fade .25s ease both; }
+  .press { transition: transform .15s ease, background-color .2s ease, border-color .2s ease; }
+  .press:active { transform: scale(.97); }
+  button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    .rise, .sheet, .scrim { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+<script>
+  tailwind.config = { theme: { extend: { colors: {
+    bg: 'var(--bg)', surface: 'var(--surface)', surface2: 'var(--surface-2)',
+    line: 'var(--line)', muted: 'var(--muted)', tg: 'var(--accent)'
+  } } } };
+</script>
+
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+
+<script>
+"use strict";
+const { useState, useEffect, useRef } = React;
+
+// ===== Telegram Mini App =====
+const TG = window.Telegram && window.Telegram.WebApp;
+const IN_TG = !!(TG && TG.initData);
+if (TG) {
+  try {
+    TG.ready(); TG.expand();
+    TG.setHeaderColor('#09090b'); TG.setBackgroundColor('#09090b');
+    if (TG.disableVerticalSwipes) TG.disableVerticalSwipes();
+  } catch (e) {}
+}
+document.addEventListener('click', function (e) {
+  if (!IN_TG) return;
+  var a = e.target.closest && e.target.closest('a[href^="http"]');
+  if (a) {
+    e.preventDefault();
+    if (a.href.indexOf('https://t.me/') === 0) TG.openTelegramLink(a.href); else TG.openLink(a.href);
+    return;
+  }
+  if (e.target.closest && e.target.closest('button') && TG.HapticFeedback) TG.HapticFeedback.impactOccurred('light');
+});
+
+const __ICONS = { "ChevronDown": "<path d=\"m6 9 6 6 6-6\"></path>", "CheckCircle2": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m9 12 2 2 4-4\"></path>", "Phone": "<path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z\"></path>", "Send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\"></path><path d=\"m21.854 2.147-10.94 10.939\"></path>", "Mail": "<rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"></rect><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\"></path>", "Copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path>", "Check": "<path d=\"M20 6 9 17l-5-5\"></path>", "X": "<path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path>", "ArrowUpRight": "<path d=\"M7 7h10v10\"></path><path d=\"M7 17 17 7\"></path>", "Zap": "<path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"></path>", "Flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"></path>", "Palette": "<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"></circle><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\"></path>", "Shirt": "<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\"></path>", "Smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\"></rect><path d=\"M12 18h.01\"></path>", "Layers": "<path d=\"m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z\"></path><path d=\"m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65\"></path><path d=\"m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65\"></path>", "Sparkles": "<path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"></path><path d=\"M20 3v4\"></path><path d=\"M22 5h-4\"></path><path d=\"M4 17v2\"></path><path d=\"M5 18H3\"></path>" };
+function makeIcon(name) { return function Icon(props) { const size = props.size || 24; return React.createElement('svg', { xmlns: 'http://www.w3.org/2000/svg', width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: props.strokeWidth || 2, strokeLinecap: 'round', strokeLinejoin: 'round', className: props.className, 'aria-hidden': 'true', dangerouslySetInnerHTML: { __html: __ICONS[name] } }); }; }
+const ChevronDown = makeIcon('ChevronDown'), CheckCircle2 = makeIcon('CheckCircle2'), Phone = makeIcon('Phone'), Send = makeIcon('Send'), Mail = makeIcon('Mail'), Copy = makeIcon('Copy'), Check = makeIcon('Check'), X = makeIcon('X'), ArrowUpRight = makeIcon('ArrowUpRight'), Zap = makeIcon('Zap'), Flame = makeIcon('Flame'), Palette = makeIcon('Palette'), Shirt = makeIcon('Shirt'), Smartphone = makeIcon('Smartphone'), Layers = makeIcon('Layers'), Sparkles = makeIcon('Sparkles');
+"use strict";
+const PROJECTS = [
+    {
+        id: 'spa',
+        title: 'ORYA',
+        tag: 'SPA-салон',
+        url: 'https://croooud.github.io/Spa-salon-page/',
+        text: 'Лендинг SPA-салона: три программы с ценами, слайдер отзывов и форма заявки со скидкой 15% на первый визит. Чистые HTML, CSS и JS без внешних библиотек.',
+        stack: ['HTML', 'CSS', 'JS'],
+        result: 'Форма заявки с маской телефона',
+        theme: { bg: '#F6F2EA', ink: '#3F4026', accent: '#6B6B3A', btnInk: '#ffffff', brand: 'ORYA', eyebrow: 'SPA-салон · Москва', head: 'Тишина, в которой ', em: 'вы возвращаетесь к себе', btn: 'Получить скидку 15%', radius: 999, tracking: '0.24em' },
+    },
+    {
+        id: 'barber',
+        title: 'Blade & Beard',
+        tag: 'Барбершоп',
+        url: 'https://croooud.github.io/Barber-landing_1/',
+        text: 'Лендинг барбершопа: свайп-галерея работ, шесть услуг с ценами и онлайн-запись. Плавная прокрутка Lenis и появление блоков на GSAP.',
+        stack: ['Tailwind', 'GSAP', 'Lenis', 'Swiper'],
+        result: 'Свайп-галерея и прайс из 6 услуг',
+        theme: { bg: '#0A0A0A', ink: '#F5F5F5', accent: '#D4AF37', btnInk: '#0A0A0A', brand: 'Blade & Beard', eyebrow: 'Стиль · Точность · Характер', head: 'Больше, чем ', em: 'стрижка.', btn: 'Записаться онлайн', radius: 0, tracking: '0.05em' },
+    },
+    {
+        id: 'nail',
+        title: 'Nail Art & Care',
+        tag: 'Студия маникюра',
+        url: 'https://croooud.github.io/nail-landing/',
+        text: 'Лендинг студии маникюра: блок о мастере, галерея со свайпом и прайс из шести услуг. Анимации GSAP и плавная прокрутка Lenis.',
+        stack: ['Tailwind', 'GSAP', 'Lenis', 'Swiper'],
+        result: 'Свайп-галерея и прайс из 6 услуг',
+        theme: { bg: '#2C2A29', ink: '#FFFFFF', accent: '#C97A7E', btnInk: '#ffffff', brand: 'Nail Art & Care', eyebrow: 'Студия маникюра', head: 'Маникюр, который хочется ', em: 'рассматривать', btn: 'Записаться онлайн', radius: 999, tracking: '0.05em' },
+    },
+];
+
+const SERVICES = [
+    { icon: Smartphone, title: 'Telegram Mini Apps', note: 'Магазины, записи, каталоги прямо в мессенджере', wide: true },
+    { icon: Layers, title: 'Сайты под ключ', note: 'От макета до домена' },
+    { icon: Sparkles, title: 'Редизайн', note: 'Обновляю то, что уже есть' },
+];
+function Avatar() {
+    return (React.createElement("div", { className: "relative shrink-0" },
+        React.createElement("div", { className: "h-[72px] w-[72px] rounded-full p-[2px]", style: { background: 'conic-gradient(from 200deg, #2AABEE, #7c6cff, #2AABEE)' } },
+            React.createElement("img", { src: "data:image/jpeg;base64,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", alt: "\u0418\u0432\u0430\u043D", className: "h-full w-full rounded-full object-cover", style: { border: "3px solid var(--bg)" } })),
+        React.createElement("span", { className: "absolute bottom-0.5 right-0.5 h-4 w-4 rounded-full border-[3px] border-bg bg-emerald-400", "aria-label": "\u041D\u0430 \u0441\u0432\u044F\u0437\u0438" })));
+}
+"use strict";
+// Меняйте state на 'busy', когда нет свободных окон
+const STATUS = {
+    state: 'open',
+    open: { dot: 'bg-emerald-400', title: 'Открыт для проектов', sub: 'Отвечаю быстро · лендинг за 3–7 дней' },
+    busy: { dot: 'bg-amber-400', title: 'Сейчас занят', sub: 'Отвечу в течение дня · запуск после текущих задач' },
+};
+function StatusBadge() {
+    const s = STATUS[STATUS.state];
+    return (React.createElement("div", { className: "mt-4 flex items-center gap-3 rounded-[16px] border border-line bg-surface px-4 py-3" },
+        React.createElement("span", { className: "relative flex h-2.5 w-2.5 shrink-0" },
+            React.createElement("span", { className: 'absolute inline-flex h-full w-full rounded-full opacity-60 motion-safe:animate-ping ' + s.dot }),
+            React.createElement("span", { className: 'relative inline-flex h-2.5 w-2.5 rounded-full ' + s.dot })),
+        React.createElement("div", { className: "min-w-0" },
+            React.createElement("div", { className: "text-[14px] font-semibold leading-tight" }, s.title),
+            React.createElement("div", { className: "mt-0.5 text-[12.5px] leading-snug text-muted" }, s.sub))));
+}
+
+function ProfileHeader() {
+    return (React.createElement("header", { className: "rise px-5 pt-8" },
+        React.createElement("div", { className: "flex items-center gap-4" },
+            React.createElement(Avatar, null),
+            React.createElement("div", { className: "min-w-0" },
+                React.createElement("h1", { className: "font-display text-[19px] font-semibold leading-tight" }, "\u0418\u0432\u0430\u043D"),
+                React.createElement("p", { className: "mt-0.5 text-[14px] text-muted" }, "Web & Telegram \u0420\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A"))),
+        React.createElement("p", { className: "mt-5 text-[15px] leading-relaxed text-zinc-300" }, "\u0421\u0432\u0435\u0436\u0438\u0439 \u0432\u0437\u0433\u043B\u044F\u0434 \u0438 \u0430\u043A\u0442\u0443\u0430\u043B\u044C\u043D\u044B\u0439 \u0441\u0442\u0435\u043A: React 18, Tailwind, Telegram Mini Apps. \u0414\u0435\u043B\u0430\u044E \u0431\u044B\u0441\u0442\u0440\u043E, \u0431\u0435\u0437 \u0448\u0430\u0431\u043B\u043E\u043D\u043D\u043E\u0439 \u0432\u0451\u0440\u0441\u0442\u043A\u0438."),
+        React.createElement(StatusBadge, null)));
+}
+function SectionTitle({ children, hint }) {
+    return (React.createElement("div", { className: "mb-4 flex items-baseline justify-between px-5" },
+        React.createElement("h2", { className: "font-display text-[15px] font-medium tracking-tight" }, children),
+        hint && React.createElement("span", { className: "text-[12px] text-muted" }, hint)));
+}
+function ServiceTile({ icon: Icon, title, note, wide }) {
+    return (React.createElement("div", { className: 'press flex gap-3 rounded-[20px] border border-line bg-surface p-4 ' + (wide ? 'col-span-2 items-center' : 'flex-col') },
+        React.createElement("div", { className: "grid h-10 w-10 shrink-0 place-items-center rounded-[14px] bg-tg/15 text-tg" },
+            React.createElement(Icon, { size: 20, strokeWidth: 2 })),
+        React.createElement("div", { className: "min-w-0" },
+            React.createElement("div", { className: "text-[14px] font-semibold leading-snug" }, title),
+            React.createElement("div", { className: "mt-1 text-[12.5px] leading-snug text-muted" }, note))));
+}
+function Services() {
+    return (React.createElement("section", { className: "rise mt-10", style: { animationDelay: '.08s' } },
+        React.createElement(SectionTitle, null, "\u0427\u0442\u043E \u044F \u0434\u0435\u043B\u0430\u044E"),
+        React.createElement("div", { className: "grid grid-cols-2 gap-3 px-5" }, SERVICES.map((s) => React.createElement(ServiceTile, { key: s.title, ...s })))));
+}
+"use strict";
+function Cover({ project, height }) {
+    const t = project.theme;
+    const serif = "'Playfair Display', Georgia, serif";
+    return (React.createElement("div", { className: "relative flex flex-col overflow-hidden px-5 py-4", style: { background: t.bg, color: t.ink, height } },
+        React.createElement("div", { className: "absolute -right-12 -top-12 h-40 w-40 rounded-full border opacity-40", style: { borderColor: t.accent } }),
+        React.createElement("div", { className: "relative flex items-center justify-between" },
+            React.createElement("span", { style: { fontFamily: serif, fontSize: 14, letterSpacing: '0.04em' } }, t.brand),
+            React.createElement("span", { className: "h-px w-8", style: { background: t.accent } })),
+        React.createElement("div", { className: "relative mt-auto pb-1" },
+            React.createElement("div", { style: { fontSize: 8.5, letterSpacing: '0.28em', textTransform: 'uppercase', color: t.accent, fontFamily: 'Montserrat, system-ui, sans-serif' } }, t.eyebrow),
+            React.createElement("div", { className: "mt-2", style: { fontFamily: serif, fontSize: 23, lineHeight: 1.12 } },
+                t.head,
+                React.createElement("em", { style: { color: t.accent } }, t.em)),
+            React.createElement("span", { className: "mt-3 inline-block", style: { background: t.accent, color: t.btnInk, borderRadius: t.radius, padding: '7px 14px', fontSize: 10, fontWeight: 600, letterSpacing: '0.04em', fontFamily: 'Montserrat, system-ui, sans-serif' } }, t.btn))));
+}
+function ProjectCard({ project, onOpen }) {
+    return (React.createElement("article", { className: "w-[82%] shrink-0 snap-center overflow-hidden rounded-[24px] border border-line bg-surface" },
+        React.createElement("div", { className: "relative" },
+            React.createElement(Cover, { project: project, height: 208 }),
+            React.createElement("span", { className: "absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-[10.5px] font-medium text-white backdrop-blur" }, "\u041F\u0435\u0440\u0432\u044B\u0439 \u044D\u043A\u0440\u0430\u043D \u0441\u0430\u0439\u0442\u0430")),
+        React.createElement("div", { className: "p-4" },
+            React.createElement("div", { className: "text-[12px] text-muted" }, project.tag),
+            React.createElement("h3", { className: "mt-1 font-display text-[15px] font-medium leading-snug" }, project.title),
+            React.createElement("button", { onClick: () => onOpen(project), className: "press mt-4 flex w-full items-center justify-center gap-1.5 rounded-[14px] bg-surface2 py-3 text-[14px] font-semibold text-tg hover:bg-[#23232a]" },
+                "\u041F\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u0440\u0430\u0431\u043E\u0442\u0443 ",
+                React.createElement(ArrowUpRight, { size: 16 })))));
+}
+
+"use strict";
+const PRICES = [
+    {
+        id: 'landing',
+        title: 'Сайт-визитка / Лендинг',
+        price: 'от 4 900 ₽',
+        text: 'Индивидуальный дизайн, адаптивная верстка (ПК и смартфон), подключение домена и публикация в сети.',
+        items: ['Индивидуальный дизайн', 'Адаптивная верстка: ПК и смартфон', 'Подключение домена', 'Публикация в сети'],
+        note: 'Быстрый результат за несколько дней',
+    },
+    {
+        id: 'miniapp',
+        title: 'Telegram Mini App',
+        price: 'от 7 900 ₽',
+        text: 'Разработка интерактивного веб-приложения внутри мессенджера. Вау-эффект для клиентов.',
+        items: ['Витрины услуг', 'Онлайн-запись', 'Каталоги', 'Интерактивный интерфейс внутри Telegram'],
+        note: 'Идеально для витрин услуг, записи и каталогов',
+    },
+    {
+        id: 'redesign',
+        title: 'Редизайн и доработки',
+        price: 'от 2 900 ₽',
+        text: 'Обновление устаревшего дизайна, исправление ошибок верстки, ускорение работы и адаптация старых сайтов под современные смартфоны.',
+        items: ['Обновление устаревшего дизайна', 'Исправление ошибок верстки', 'Ускорение работы', 'Адаптация под смартфоны'],
+        note: 'Работаю с вашим готовым сайтом',
+    },
+];
+function PriceItem({ item, open, onToggle, onGo }) {
+    const panelId = 'price-panel-' + item.id;
+    return (React.createElement("div", { className: 'overflow-hidden rounded-[20px] border bg-surface transition-colors duration-300 ' + (open ? 'border-tg/50' : 'border-line') },
+        React.createElement("button", { onClick: onToggle, "aria-expanded": open, "aria-controls": panelId, className: "press flex w-full items-center gap-3 p-4 text-left" },
+            React.createElement("div", { className: "min-w-0 flex-1" },
+                React.createElement("div", { className: "text-[15px] font-semibold leading-snug" }, item.title),
+                React.createElement("div", { className: "mt-0.5 text-[14px] font-semibold text-tg" }, item.price)),
+            React.createElement("span", { className: 'grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors duration-300 ' + (open ? 'bg-tg text-[#04141d]' : 'bg-surface2 text-muted') },
+                React.createElement(ChevronDown, { size: 18, className: 'transition-transform duration-300 ' + (open ? 'rotate-180' : '') }))),
+        React.createElement("div", { id: panelId, className: "grid transition-[grid-template-rows] duration-300 ease-out", style: { gridTemplateRows: open ? '1fr' : '0fr' } },
+            React.createElement("div", { className: "min-h-0 overflow-hidden" },
+                React.createElement("div", { className: "border-t border-line px-4 pb-4 pt-3" },
+                    React.createElement("p", { className: "text-[14px] leading-relaxed text-zinc-300" }, item.text),
+                    React.createElement("ul", { className: "mt-3 flex flex-col gap-2" }, item.items.map((t) => (React.createElement("li", { key: t, className: "flex items-start gap-2.5 text-[13.5px] text-zinc-200" },
+                        React.createElement(CheckCircle2, { size: 17, className: "mt-px shrink-0 text-tg" }),
+                        React.createElement("span", null, t))))),
+                    React.createElement("div", { className: "mt-3 rounded-[12px] bg-tg/10 px-3 py-2 text-[12.5px] text-tg" }, item.note),
+                    React.createElement("button", { onClick: onGo, className: "press mt-4 w-full rounded-[14px] bg-surface2 py-3 text-[14px] font-semibold" }, "\u041E\u0431\u0441\u0443\u0434\u0438\u0442\u044C \u0437\u0430\u0434\u0430\u0447\u0443"))))));
+}
+function Pricing({ onGo }) {
+    const [openId, setOpenId] = useState('landing');
+    return (React.createElement("section", { className: "rise mt-10", style: { animationDelay: '.12s' } },
+        React.createElement(SectionTitle, { hint: "\u0446\u0435\u043D\u044B \u0432 \u0440\u0443\u0431\u043B\u044F\u0445" }, "\u0423\u0441\u043B\u0443\u0433\u0438 \u0438 \u0446\u0435\u043D\u044B"),
+        React.createElement("div", { className: "flex flex-col gap-3 px-5" }, PRICES.map((p) => (React.createElement(PriceItem, { key: p.id, item: p, open: openId === p.id, onToggle: () => setOpenId(openId === p.id ? null : p.id), onGo: onGo }))))));
+}
+
+function Works({ onOpen }) {
+    const ref = useRef(null);
+    const [idx, setIdx] = useState(0);
+    const onScroll = () => {
+        const el = ref.current;
+        if (!el)
+            return;
+        const card = el.firstElementChild;
+        const step = card.getBoundingClientRect().width + 12;
+        setIdx(Math.min(PROJECTS.length - 1, Math.round(el.scrollLeft / step)));
+    };
+    return (React.createElement("section", { className: "rise mt-10", style: { animationDelay: '.16s' } },
+        React.createElement(SectionTitle, { hint: "\u043B\u0438\u0441\u0442\u0430\u0439\u0442\u0435 \u2192" }, "\u0428\u0430\u0431\u043B\u043E\u043D\u044B \u0440\u0430\u0431\u043E\u0442"),
+        React.createElement("div", { ref: ref, onScroll: onScroll, className: "no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1", style: { scrollPaddingInline: '20px' } }, PROJECTS.map((p) => React.createElement(ProjectCard, { key: p.id, project: p, onOpen: onOpen }))),
+        React.createElement("div", { className: "mt-4 flex justify-center gap-1.5", "aria-hidden": "true" }, PROJECTS.map((p, i) => (React.createElement("span", { key: p.id, className: "h-1.5 rounded-full transition-all duration-300", style: { width: i === idx ? 20 : 6, background: i === idx ? 'var(--accent)' : 'var(--line)' } }))))));
+}
+"use strict";
+function ProjectSheet({ project, onClose, onDiscuss }) {
+    useEffect(() => {
+        const k = (e) => e.key === 'Escape' && onClose();
+        window.addEventListener('keydown', k);
+        return () => window.removeEventListener('keydown', k);
+    }, []);
+    return (React.createElement("div", { className: "fixed inset-0 z-40 flex items-end justify-center", role: "dialog", "aria-modal": "true", "aria-label": project.title },
+        React.createElement("div", { className: "scrim absolute inset-0 bg-black/70", onClick: onClose }),
+        React.createElement("div", { className: "sheet relative z-10 max-h-[92%] w-full max-w-md overflow-y-auto rounded-t-[28px] border-t border-line bg-surface px-5 pt-3", style: { paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))' } },
+            React.createElement("div", { className: "mx-auto mb-4 h-1 w-10 rounded-full bg-line" }),
+            React.createElement("button", { onClick: onClose, "aria-label": "\u0417\u0430\u043A\u0440\u044B\u0442\u044C", className: "press absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white" },
+                React.createElement(X, { size: 16 })),
+            React.createElement("div", { className: "overflow-hidden rounded-[18px]" },
+                React.createElement(Cover, { project: project, height: 190 })),
+            React.createElement("div", { className: "mt-4 text-[12px] text-muted" }, project.tag),
+            React.createElement("h3", { className: "font-display text-[17px] font-medium" }, project.title),
+            React.createElement("p", { className: "mt-3 text-[14.5px] leading-relaxed text-zinc-300" }, project.text),
+            React.createElement("div", { className: "mt-4 flex flex-wrap gap-2" }, project.stack.map((s) => React.createElement("span", { key: s, className: "rounded-full border border-line bg-surface2 px-3 py-1 text-[12.5px] text-zinc-300" }, s))),
+            React.createElement("div", { className: "mt-4 flex items-center gap-2 rounded-[14px] bg-tg/10 px-4 py-3 text-[14px] font-medium text-tg" },
+                React.createElement(Zap, { size: 16 }),
+                " ",
+                project.result),
+            React.createElement("a", { href: project.url, target: "_blank", rel: "noopener", className: "press mt-5 flex w-full items-center justify-center gap-2 rounded-[14px] py-3.5 text-[14.5px] font-semibold", style: { background: 'var(--accent)', color: 'var(--accent-ink)' } },
+                "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0441\u0430\u0439\u0442 ",
+                React.createElement(ArrowUpRight, { size: 16 })),
+            React.createElement("button", { onClick: onDiscuss, className: "press mt-2.5 w-full rounded-[14px] bg-surface2 py-3.5 text-[14.5px] font-semibold" }, "\u0425\u043E\u0447\u0443 \u0442\u0430\u043A\u043E\u0439 \u0436\u0435 \u043F\u0440\u043E\u0435\u043A\u0442"))));
+}
+
+function CopyRow({ icon: Icon, label, value, href }) {
+    const [done, setDone] = useState(false);
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(value);
+            setDone(true);
+            setTimeout(() => setDone(false), 1600);
+        }
+        catch (e) { /* значение остаётся выделяемым текстом */ }
+    };
+    return (React.createElement("div", { className: "flex items-center gap-3 rounded-[16px] bg-surface2 p-3" },
+        React.createElement("div", { className: "grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-tg/15 text-tg" },
+            React.createElement(Icon, { size: 18 })),
+        React.createElement("div", { className: "min-w-0 flex-1" },
+            React.createElement("div", { className: "text-[12px] text-muted" }, label),
+            React.createElement("div", { className: "select-all truncate text-[14.5px] font-medium" }, value)),
+        React.createElement("button", { onClick: copy, "aria-label": 'Скопировать ' + label, className: "press grid h-9 w-9 place-items-center rounded-full bg-surface text-muted" }, done ? React.createElement(Check, { size: 16, className: "text-emerald-400" }) : React.createElement(Copy, { size: 16 }))));
+}
+function Contacts({ innerRef }) {
+    return (React.createElement("section", { id: "contacts", ref: innerRef, className: "mt-10 scroll-mt-6" },
+        React.createElement(SectionTitle, null, "\u041A\u043E\u043D\u0442\u0430\u043A\u0442\u044B"),
+        React.createElement("div", { className: "mx-5 rounded-[24px] border border-line bg-surface p-4" },
+            React.createElement("p", { className: "px-1 pb-3 text-[14px] leading-relaxed text-zinc-300" }, "\u041E\u043F\u0438\u0448\u0438\u0442\u0435 \u0437\u0430\u0434\u0430\u0447\u0443 \u0432 \u0434\u0432\u0443\u0445 \u0441\u0442\u0440\u043E\u043A\u0430\u0445. \u041E\u0442\u0432\u0435\u0447\u0430\u044E \u0432 Telegram \u0432 \u0442\u0435\u0447\u0435\u043D\u0438\u0435 \u0434\u043D\u044F \u0438 \u043D\u0430\u0437\u044B\u0432\u0430\u044E \u0441\u0440\u043E\u043A\u0438 \u0438 \u0446\u0435\u043D\u0443 \u043F\u043E\u0441\u043B\u0435 \u043F\u0435\u0440\u0432\u043E\u0433\u043E \u0441\u043E\u0437\u0432\u043E\u043D\u0430."),
+            React.createElement("div", { className: "flex flex-col gap-2.5" },
+                React.createElement(CopyRow, { icon: Send, label: "Telegram", value: "@IvanMiroshnichenkoo" }),
+                React.createElement(CopyRow, { icon: Phone, label: "\u0422\u0435\u043B\u0435\u0444\u043E\u043D", value: "+7 952 816 2960" }))),
+        React.createElement("p", { className: "mt-6 px-5 text-center text-[12px] text-muted" }, "\u0418\u0432\u0430\u043D \u00B7 Web & Telegram \u00B7 2026")));
+}
+function MainButton({ atContacts, onGo }) {
+    if (IN_TG) return null;
+    const common = 'press flex w-full items-center justify-center gap-2 rounded-[16px] py-4 text-[16px] font-semibold shadow-[0_8px_30px_rgba(42,171,238,.35)]';
+    const style = { background: 'var(--accent)', color: 'var(--accent-ink)' };
+    return (React.createElement("div", { className: "pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center" },
+        React.createElement("div", { className: "pointer-events-auto w-full max-w-md px-4 pt-6", style: { paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, var(--bg) 55%, transparent)' } }, atContacts ? (React.createElement("a", { href: "https://t.me/IvanMiroshnichenkoo", target: "_blank", rel: "noopener", className: common, style: style },
+            React.createElement(Send, { size: 18 }),
+            " \u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u0432 Telegram")) : (React.createElement("button", { onClick: onGo, className: common, style: style }, "\u041E\u0431\u0441\u0443\u0434\u0438\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442")))));
+}
+function App() {
+    const [project, setProject] = useState(null);
+    const [atContacts, setAtContacts] = useState(false);
+    const contactsRef = useRef(null);
+    useEffect(() => {
+        const el = contactsRef.current;
+        if (!el || !('IntersectionObserver' in window))
+            return;
+        const io = new IntersectionObserver(([e]) => setAtContacts(e.isIntersecting), { threshold: 0.55 });
+        io.observe(el);
+        return () => io.disconnect();
+    }, []);
+    const goContacts = () => {
+        setProject(null);
+        contactsRef.current && contactsRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    useEffect(function () {
+        if (!IN_TG) return;
+        var mb = TG.MainButton;
+        var handler = atContacts ? function () { TG.openTelegramLink('https://t.me/IvanMiroshnichenkoo'); } : goContacts;
+        mb.setParams({ text: atContacts ? 'Написать в Telegram' : 'Обсудить проект', color: '#2AABEE', text_color: '#04141d', is_visible: true });
+        mb.onClick(handler);
+        return function () { mb.offClick(handler); };
+    }, [atContacts]);
+    return (React.createElement("div", { className: "mx-auto min-h-screen w-full max-w-md bg-bg md:border-x md:border-line", style: { paddingBottom: 130 } },
+        React.createElement(ProfileHeader, null),
+        React.createElement(Services, null), React.createElement(Pricing, { onGo: goContacts }),
+        React.createElement(Works, { onOpen: setProject }),
+        React.createElement(Contacts, { innerRef: contactsRef }),
+        React.createElement(MainButton, { atContacts: atContacts, onGo: goContacts }),
+        project && React.createElement(ProjectSheet, { project: project, onClose: () => setProject(null), onDiscuss: goContacts })));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+
+</script>
+</body>
+</html>
