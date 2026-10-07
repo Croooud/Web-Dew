@@ -105,9 +105,10 @@ document.addEventListener('click', function (e) {
   if (e.target.closest && e.target.closest('button') && TG.HapticFeedback) TG.HapticFeedback.impactOccurred('light');
 });
 
-const __ICONS = { "ChevronDown": "<path d=\"m6 9 6 6 6-6\"></path>", "CheckCircle2": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m9 12 2 2 4-4\"></path>", "Phone": "<path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z\"></path>", "Send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\"></path><path d=\"m21.854 2.147-10.94 10.939\"></path>", "Mail": "<rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"></rect><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\"></path>", "Copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path>", "Check": "<path d=\"M20 6 9 17l-5-5\"></path>", "X": "<path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path>", "ArrowUpRight": "<path d=\"M7 7h10v10\"></path><path d=\"M7 17 17 7\"></path>", "Zap": "<path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"></path>", "Flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"></path>", "Palette": "<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"></circle><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\"></path>", "Shirt": "<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\"></path>", "Smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\"></rect><path d=\"M12 18h.01\"></path>", "Layers": "<path d=\"m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z\"></path><path d=\"m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65\"></path><path d=\"m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65\"></path>", "Sparkles": "<path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"></path><path d=\"M20 3v4\"></path><path d=\"M22 5h-4\"></path><path d=\"M4 17v2\"></path><path d=\"M5 18H3\"></path>" };
+const __ICONS = { "Gift": "<rect x=\"3\" y=\"8\" width=\"18\" height=\"4\" rx=\"1\"></rect><path d=\"M12 8v13\"></path><path d=\"M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7\"></path><path d=\"M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5\"></path>", "User": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"></path><circle cx=\"12\" cy=\"7\" r=\"4\"></circle>", "ChevronDown": "<path d=\"m6 9 6 6 6-6\"></path>", "CheckCircle2": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m9 12 2 2 4-4\"></path>", "Phone": "<path d=\"M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z\"></path>", "Send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\"></path><path d=\"m21.854 2.147-10.94 10.939\"></path>", "Mail": "<rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"></rect><path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\"></path>", "Copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path>", "Check": "<path d=\"M20 6 9 17l-5-5\"></path>", "X": "<path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path>", "ArrowUpRight": "<path d=\"M7 7h10v10\"></path><path d=\"M7 17 17 7\"></path>", "Zap": "<path d=\"M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z\"></path>", "Flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"></path>", "Palette": "<circle cx=\"13.5\" cy=\"6.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"17.5\" cy=\"10.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"8.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\"></circle><circle cx=\"6.5\" cy=\"12.5\" r=\".5\" fill=\"currentColor\"></circle><path d=\"M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z\"></path>", "Shirt": "<path d=\"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z\"></path>", "Smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\"></rect><path d=\"M12 18h.01\"></path>", "Layers": "<path d=\"m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z\"></path><path d=\"m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65\"></path><path d=\"m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65\"></path>", "Sparkles": "<path d=\"M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z\"></path><path d=\"M20 3v4\"></path><path d=\"M22 5h-4\"></path><path d=\"M4 17v2\"></path><path d=\"M5 18H3\"></path>" };
 function makeIcon(name) { return function Icon(props) { const size = props.size || 24; return React.createElement('svg', { xmlns: 'http://www.w3.org/2000/svg', width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: props.strokeWidth || 2, strokeLinecap: 'round', strokeLinejoin: 'round', className: props.className, 'aria-hidden': 'true', dangerouslySetInnerHTML: { __html: __ICONS[name] } }); }; }
 const ChevronDown = makeIcon('ChevronDown'), CheckCircle2 = makeIcon('CheckCircle2'), Phone = makeIcon('Phone'), Send = makeIcon('Send'), Mail = makeIcon('Mail'), Copy = makeIcon('Copy'), Check = makeIcon('Check'), X = makeIcon('X'), ArrowUpRight = makeIcon('ArrowUpRight'), Zap = makeIcon('Zap'), Flame = makeIcon('Flame'), Palette = makeIcon('Palette'), Shirt = makeIcon('Shirt'), Smartphone = makeIcon('Smartphone'), Layers = makeIcon('Layers'), Sparkles = makeIcon('Sparkles');
+const Gift = makeIcon('Gift'), UserIcon = makeIcon('User');
 "use strict";
 const PROJECTS = [
     {
@@ -347,6 +348,51 @@ function CopyRow({ icon: Icon, label, value, href }) {
             React.createElement("div", { className: "select-all truncate text-[14.5px] font-medium" }, value)),
         React.createElement("button", { onClick: copy, "aria-label": 'Скопировать ' + label, className: "press grid h-9 w-9 place-items-center rounded-full bg-surface text-muted" }, done ? React.createElement(Check, { size: 16, className: "text-emerald-400" }) : React.createElement(Copy, { size: 16 }))));
 }
+// Фото для блока «Обо мне»: вставьте ссылку или data:image — пока пусто, показывается плейсхолдер
+const ABOUT_PHOTO = '';
+function About() {
+    return (React.createElement("section", { className: "mt-10" },
+        React.createElement(SectionTitle, null, "Обо мне"),
+        React.createElement("div", { className: "mx-5 flex flex-col items-center rounded-[24px] border border-line bg-surface p-5", ...R(0) },
+            React.createElement("div", { className: "grid h-24 w-24 place-items-center overflow-hidden rounded-full border border-dashed border-white/25 bg-surface2 text-muted" },
+                ABOUT_PHOTO
+                    ? React.createElement("img", { src: ABOUT_PHOTO, alt: "Иван", className: "h-full w-full object-cover" })
+                    : React.createElement(UserIcon, { size: 36, strokeWidth: 1.5 })),
+            React.createElement("p", { className: "mt-4 self-stretch text-[14.5px] leading-relaxed text-zinc-300" }, "Я студент университета и веб-разработчик. В отличие от конвейерных агентств, я работаю на свое имя и репутацию. Глубоко погружаюсь в каждый проект, всегда на связи и использую только актуальный стек технологий, чтобы ваш бизнес выглядел современно."))));
+}
+const FAQ = [
+    { q: 'У меня уже есть соцсети, зачем мне сайт?', a: 'Сайт подчеркивает статус, не зависит от алгоритмов и возможных блокировок, а главное — позволяет автоматизировать сбор заявок 24/7.' },
+    { q: 'Я ничего не понимаю в доменах и хостингах.', a: 'Я беру всю техническую рутину на себя: от покупки адреса до настройки серверов. Вам останется только принимать клиентов.' },
+    { q: 'Смогу ли я сам менять цены на сайте?', a: 'Да, я бесплатно покажу, как в пару кликов обновлять информацию, или настрою для вас удобную админ-панель.' },
+];
+function FaqItem({ item, open, onToggle, i }) {
+    const id = 'faq-panel-' + i;
+    return (React.createElement("div", { className: 'overflow-hidden rounded-[20px] border bg-surface transition-colors duration-300 ' + (open ? 'border-tg/50' : 'border-line'), ...R(i) },
+        React.createElement("button", { onClick: onToggle, "aria-expanded": open, "aria-controls": id, className: "press flex w-full items-center gap-3 p-4 text-left" },
+            React.createElement("span", { className: "min-w-0 flex-1 text-[14.5px] font-semibold leading-snug" }, item.q),
+            React.createElement("span", { className: 'grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors duration-300 ' + (open ? 'bg-tg text-[#04141d]' : 'bg-surface2 text-muted') },
+                React.createElement(ChevronDown, { size: 17, className: 'chev ' + (open ? 'rotate-180' : '') }))),
+        React.createElement("div", { id: id, "aria-hidden": !open, className: "acc grid", style: { gridTemplateRows: open ? '1fr' : '0fr' } },
+            React.createElement("div", { className: "min-h-0 overflow-hidden" },
+                React.createElement("p", { className: 'acc-in px-4 pb-4 text-[14px] leading-relaxed text-zinc-300' + (open ? ' is-open' : '') }, item.a)))));
+}
+function Faq() {
+    const [openI, setOpenI] = useState(null);
+    return (React.createElement("section", { className: "mt-10" },
+        React.createElement(SectionTitle, null, "Частые вопросы"),
+        React.createElement("div", { className: "flex flex-col gap-3 px-5" }, FAQ.map((f, i) => React.createElement(FaqItem, { key: i, i, item: f, open: openI === i, onToggle: () => setOpenI(openI === i ? null : i) })))));
+}
+function LeadMagnet() {
+    return (React.createElement("div", { className: "glass shine mx-5 mt-4 rounded-[24px] p-5", "data-r": "", style: { '--d': 1, '--s': 2, borderColor: 'rgba(42,171,238,.35)', background: 'linear-gradient(145deg, rgba(42,171,238,.16), rgba(42,171,238,.03))' } },
+        React.createElement("div", { className: "flex items-start gap-3.5" },
+            React.createElement("div", { className: "grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-tg/20 text-tg" },
+                React.createElement(Gift, { size: 22 })),
+            React.createElement("p", { className: "text-[14.5px] leading-relaxed text-zinc-100" }, "Не уверены, какой именно формат подойдет вашему бизнесу? Напишите мне, и я бесплатно соберу черновой концепт вашего будущего проекта.")),
+        React.createElement("a", { href: "https://t.me/IvanMiroshnichenkoo?text=" + encodeURIComponent("Здравствуйте! Хочу получить бесплатный набросок концепции проекта."), target: "_blank", rel: "noopener", className: "press mt-4 flex w-full items-center justify-center gap-2 rounded-[14px] py-3.5 text-[14.5px] font-semibold", style: { background: 'var(--accent)', color: 'var(--accent-ink)' } },
+            React.createElement(Gift, { size: 17 }),
+            " Запросить набросок")));
+}
+
 function Contacts({ innerRef }) {
     return (React.createElement("section", { id: "contacts", ref: innerRef, className: "mt-10 scroll-mt-6" },
         React.createElement(SectionTitle, null, "\u041A\u043E\u043D\u0442\u0430\u043A\u0442\u044B"),
@@ -355,6 +401,7 @@ function Contacts({ innerRef }) {
             React.createElement("div", { className: "flex flex-col gap-2.5" },
                 React.createElement(CopyRow, { icon: Send, label: "Telegram", value: "@IvanMiroshnichenkoo" }),
                 React.createElement(CopyRow, { icon: Phone, label: "\u0422\u0435\u043B\u0435\u0444\u043E\u043D", value: "+7 952 816 2960" }))),
+        React.createElement(LeadMagnet, null),
         React.createElement("p", { className: "mt-6 px-5 text-center text-[12px] text-muted" }, "\u0418\u0432\u0430\u043D \u00B7 Web & Telegram \u00B7 2026")));
 }
 function MainButton({ atContacts, onGo }) {
@@ -364,7 +411,7 @@ function MainButton({ atContacts, onGo }) {
     return (React.createElement("div", { className: "pointer-events-none fixed inset-x-0 bottom-0 z-30 flex justify-center" },
         React.createElement("div", { className: "pointer-events-auto w-full max-w-md px-4 pt-6", style: { paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', background: 'linear-gradient(to top, var(--bg) 55%, transparent)' } }, atContacts ? (React.createElement("a", { href: "https://t.me/IvanMiroshnichenkoo", target: "_blank", rel: "noopener", className: common, style: style },
             React.createElement(Send, { size: 18 }),
-            " \u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u0432 Telegram")) : (React.createElement("button", { onClick: onGo, className: common, style: style }, "\u041E\u0431\u0441\u0443\u0434\u0438\u0442\u044C \u043F\u0440\u043E\u0435\u043A\u0442")))));
+            " \u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u0432 Telegram")) : (React.createElement("button", { onClick: onGo, className: common, style: style }, "Запросить набросок концепции")))));
 }
 function App() {
     const [project, setProject] = useState(null);
@@ -394,14 +441,15 @@ function App() {
         if (!IN_TG) return;
         var mb = TG.MainButton;
         var handler = atContacts ? function () { TG.openTelegramLink('https://t.me/IvanMiroshnichenkoo'); } : goContacts;
-        mb.setParams({ text: atContacts ? 'Написать в Telegram' : 'Обсудить проект', color: '#2AABEE', text_color: '#04141d', is_visible: true, has_shine_effect: true });
+        mb.setParams({ text: atContacts ? 'Написать в Telegram' : 'Запросить набросок концепции', color: '#2AABEE', text_color: '#04141d', is_visible: true, has_shine_effect: true });
         mb.onClick(handler);
         return function () { mb.offClick(handler); };
     }, [atContacts]);
     return (React.createElement("div", { className: "mx-auto min-h-screen w-full max-w-md bg-bg md:border-x md:border-line", style: { paddingBottom: 130 } },
         React.createElement(ProfileHeader, null),
-        React.createElement(Services, null), React.createElement(Pricing, { onGo: goContacts }),
+        React.createElement(Services, null), React.createElement(About, null), React.createElement(Pricing, { onGo: goContacts }),
         React.createElement(Works, { onOpen: setProject }),
+        React.createElement(Faq, null),
         React.createElement(Contacts, { innerRef: contactsRef }),
         React.createElement(MainButton, { atContacts: atContacts, onGo: goContacts }),
         project && React.createElement(ProjectSheet, { project: project, onClose: () => setProject(null), onDiscuss: goContacts })));
