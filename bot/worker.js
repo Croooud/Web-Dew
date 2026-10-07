@@ -1,5 +1,5 @@
 // Приветствие для @Ivan_WebDew_bot: на /start и любое сообщение бот отвечает
-// текстом и кнопкой, которая открывает мини-апп. Запускается как Cloudflare Worker.
+// картинкой, текстом и кнопкой, которая открывает мини-апп. Запускается как Cloudflare Worker.
 //
 // Нужны две переменные (Settings → Variables and Secrets, тип Secret):
 //   BOT_TOKEN       — токен бота из BotFather
@@ -9,10 +9,14 @@
 const APP_URL = 'https://croooud.github.io/Web-Dew/';
 const CONTACT_URL = 'https://t.me/IvanMiroshnichenkoo';
 
+// Картинка лежит в репозитории и отдаётся через GitHub Pages
+const PHOTO_URL = 'https://croooud.github.io/Web-Dew/bot/greeting.jpg';
+
+// Подпись под картинкой (до 1024 символов)
 const GREETING =
-  '<b>Привет! Я Иван, веб-разработчик.</b>\n\n' +
-  'Делаю сайты-визитки, лендинги и Telegram Mini Apps под ключ. Запуск от 3 дней.\n\n' +
-  'Нажмите кнопку ниже: там шаблоны работ, цены и <b>бесплатный набросок концепции</b> вашего проекта.';
+  '<b>Привет! Я Иван.</b>\n' +
+  'Делаю сайты и Telegram Mini Apps под ключ.\n\n' +
+  'Нажмите кнопку ниже, чтобы открыть шаблоны работ, цены и получить <b>бесплатный набросок концепции</b>.';
 
 const KEYBOARD = {
   inline_keyboard: [
@@ -45,13 +49,24 @@ export default {
 
     const msg = update && update.message;
     if (msg && msg.chat && msg.chat.type === 'private') {
-      await tg(env, 'sendMessage', {
+      // Одно сообщение: картинка, подпись и кнопки под ней
+      const ok = await tg(env, 'sendPhoto', {
         chat_id: msg.chat.id,
-        text: GREETING,
+        photo: PHOTO_URL,
+        caption: GREETING,
         parse_mode: 'HTML',
         reply_markup: KEYBOARD,
-        disable_web_page_preview: true,
       });
+      // Если картинка не загрузилась, отправляем то же самое обычным текстом
+      if (!ok) {
+        await tg(env, 'sendMessage', {
+          chat_id: msg.chat.id,
+          text: GREETING,
+          parse_mode: 'HTML',
+          reply_markup: KEYBOARD,
+          disable_web_page_preview: true,
+        });
+      }
     }
 
     // Всегда 200, иначе Telegram будет повторять запрос
